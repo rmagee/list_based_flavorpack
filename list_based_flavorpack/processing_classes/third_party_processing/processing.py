@@ -36,7 +36,6 @@ class ThirdPartyProcessingClass:
         linecache.checkcache(filename=region.file_path)
         for lineno in range(first, max_line):
             item = linecache.getline(region.file_path, lineno).strip()
-            print("item is %s on line %s" % (item, lineno))
             if not item:
                 raise ValueError("There is not enough number available for this iteration on line number: %s", lineno)
             lines.append(item)
