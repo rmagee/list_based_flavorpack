@@ -80,7 +80,7 @@ class SufficientNumbersStorage(PreprocessingRule):
         task = create_and_queue_task(rendered, rule_name, task_type = "Input", run_immediately=True, task_parameters=[task_param])
         task.refresh_from_db()  # ensures we get the processed result for the task.a
         region.refresh_from_db()  # ensures we have the most udpated version (in case of parallel calls)
-
+        
         if task.status != "FINISHED":
             raise RuleError(detail="An error occurred while attempting to request new numbers from third-party system. Please check the log output from task %s" % task.name)
     

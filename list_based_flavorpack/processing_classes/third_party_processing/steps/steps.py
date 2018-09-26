@@ -34,17 +34,6 @@ from quartet_epcis.models.choices import EventTypeChoicesEnum
 from list_based_flavorpack.models import ListBasedRegion
 
 
-
-#logger = logging.getLogger('quartet_capture')
-
-        
-class SuperSimpleOutputStep(rules.Step):
-    """
-    Reads a file and send away as bytes.
-    """
-    def execute(self, data, rule_context: rules.RuleContext):
-        pass
-
      
 class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
     '''
@@ -66,25 +55,24 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                         'Region instance with name %s.'),
                       param.value
                       )
-            self.info(_('rendered template value: %s'), data)
-            region = ListBasedRegion.objects.get(machine_name=param.value)
-            print(region.machine_name)
-            # check the url/urn to see if we support the protocol
-            protocol = self._supports_protocol(region.end_point)
-
-            print("Endpoint URN", region.end_point.urn)
-            self.info('Protocol supported.  Sending message to %s.' %
-                      region.end_point.urn)
-            response = self._send_message(data, protocol, rule_context, region)
-            # Pass response for downstream processing.
-            rule_context.context['NUMBER_RESPONSE'] = response.content
-
         except models.TaskParameter.DoesNotExist:
             raise capture_errors.ExpectedTaskParameterError(
                 _('The task parameter with name List-based Region '
                   'could not be found.  This task parameter is required by '
                   'the NumberRequestTransportStep to function correctly.')
             )
+        try:
+            region = ListBasedRegion.objects.get(machine_name=param.value)
+
+            # check the url/urn to see if we support the protocol
+            protocol = self._supports_protocol(region.end_point)
+            self.info('Protocol supported.  Sending message to %s.' %
+                      region.end_point.urn)
+            response = self._send_message(data, protocol, rule_context, region)
+            # Pass response for downstream processing.
+            rule_context.context['NUMBER_RESPONSE'] = response.content
+        except Exception as e:
+            self.info(_("An error occurred while sending request to third party: %s"), str(e))
 
 
     def get_auth(self, region):
