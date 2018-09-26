@@ -90,8 +90,10 @@ class SufficientNumbersStorage(PreprocessingRule):
         except OSError as e:
             raise RuleError(detail="An error occurred while opening attempting to "
                             "read the file to store numbers: %s" % region.file_path)
+        import pudb; pudb.set_trace()
         if region.last_number_line + size >= file_size:
-            self.fetch_more_numbers(request, pool, region, size)
+            currently_available = (file_size + 1) - region.last_number_line  # don't overfetch if not needed.
+            self.fetch_more_numbers(request, pool, region, size - currently_available)
         else:
             # numbers are sufficient. Nothing to do.
             pass
