@@ -5,7 +5,7 @@ setup(
     version='1.0.1',
     packages=find_packages(),
     include_package_data=True,
-    url='https://gitlab.com/lduros/list-based-flavorpack',
+    url='https://gitlab.com/serial-lab/list_based_flavorpack',
     license='GPLv3',
     author='SerialLab Corp',
     author_email='slab@serial-lab.com',
