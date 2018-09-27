@@ -17,7 +17,6 @@
     along with RandomFlavorpack.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import sys
 import os
 import uuid
 from django.db import models
@@ -27,6 +26,7 @@ from serialbox import models as sb_models
 from quartet_output.models import EndPoint, AuthenticationInfo
 from quartet_capture.models import Rule
 from quartet_templates.models import Template
+
 
 class ListBasedRegion(sb_models.Region):
     '''
@@ -93,6 +93,7 @@ class ListBasedRegion(sb_models.Region):
         The full path to the file.
         '''
         return os.path.join(self.directory_path, str(self.file_id))
+
 
 class ProcessingParameters(models.Model):
     '''

@@ -12,27 +12,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Copyright 2018 SerialLab Corp.  All rights reserved.
-import io
 import requests
 from urllib.parse import urlparse
-from enum import Enum
 from django.utils.translation import gettext as _
-from django.core.files.base import File
-from EPCPyYes.core.v1_2 import events
-from EPCPyYes.core.v1_2 import template_events
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth, HTTPProxyAuth
+from requests.auth import HTTPBasicAuth, HTTPProxyAuth
 from quartet_capture.rules import RuleContext
 from quartet_output import errors
 from quartet_output.transport.http import HttpTransportMixin, user_agent
-from quartet_output.models import EndPoint, AuthenticationInfo
-from quartet_output.parsing import SimpleOutputParser, BusinessOutputParser
+from quartet_output.models import EndPoint
 from quartet_capture import models, rules, errors as capture_errors
-from quartet_capture.tasks import create_and_queue_task
-from quartet_epcis.parsing.steps import EPCISParsingStep
-from quartet_epcis.db_api.queries import EPCISDBProxy, EntryList
-from quartet_epcis.models.choices import EventTypeChoicesEnum
 from list_based_flavorpack.models import ListBasedRegion
-
 
      
 class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
@@ -63,7 +52,6 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
             )
         try:
             region = ListBasedRegion.objects.get(machine_name=param.value)
-
             # check the url/urn to see if we support the protocol
             protocol = self._supports_protocol(region.end_point)
             self.info('Protocol supported.  Sending message to %s.' %
@@ -109,8 +97,6 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
         info.
         :return: The response.
         '''
-        data_stream = data
-
         if not http_put:
             func = requests.post
         else:

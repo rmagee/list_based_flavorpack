@@ -16,14 +16,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with RandomFlavorpack.  If not, see <http://www.gnu.org/licenses/>.
 '''
-import os, errno
+import os
 import uuid
-from rest_framework import status
 from serialbox.rules.common import PreprocessingRule
 from serialbox.rules.errors import RuleError
 from quartet_capture.tasks import create_and_queue_task
 from quartet_capture.models import TaskParameter
-from quartet_templates.models import Template
 
 
 class ValidDirectoryError(RuleError):
