@@ -61,7 +61,7 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
             rule_context.context['NUMBER_RESPONSE'] = response.content
         except Exception as e:
             self.info(_("An error occurred while sending request to third party: %s"), str(e))
-
+            raise
 
     def get_auth(self, region):
         """
@@ -132,7 +132,6 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 func = self.post_data
             else:
                 func = self.put_data
-            
             response = func(
                 data,
                 rule_context,
@@ -140,6 +139,7 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 content_type,
                 file_extension
             )
+            response.raise_for_status()
             return response
 
     def _supports_protocol(self, endpoint: EndPoint):
