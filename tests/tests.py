@@ -211,6 +211,8 @@ class UUIDPoolTest(TestCase):
     def test_uuid_pool_correct_numbers_returned_4_calls_replenish(self):
         linecache.checkcache(filename=self.list_based_region.file_path)
         response = self.generate_allocation(5, self.test_pool, self.list_based_region)
+        file_size = sum((1 for i in open(self.list_based_region.file_path)))
+        self.assertEqual(200, file_size)        
         numbers_returned = response.number_list
         # check first five items requested.
         max_line = self.list_based_region.last_number_line + 5
@@ -220,12 +222,16 @@ class UUIDPoolTest(TestCase):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
         response = self.generate_allocation(10, self.test_pool, self.list_based_region)
+        file_size = sum((1 for i in open(self.list_based_region.file_path)))
+        self.assertEqual(200, file_size)        
         numbers_returned = response.number_list
         count = 0
         for lineno in range(6, 15):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
         response = self.generate_allocation(100, self.test_pool, self.list_based_region)
+        file_size = sum((1 for i in open(self.list_based_region.file_path)))
+        self.assertEqual(200, file_size)        
         numbers_returned = response.number_list
         count = 0
         for lineno in range(16, 100):
@@ -233,6 +239,7 @@ class UUIDPoolTest(TestCase):
             count += 1
         # replenish now. Next file size should be 400.
         response = self.generate_allocation(150, self.test_pool, self.list_based_region)
+        
         numbers_returned = response.number_list
         count = 0
         '''
