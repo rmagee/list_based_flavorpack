@@ -208,7 +208,7 @@ class UUIDPoolTest(TestCase):
             count += 1
 
 
-    def test_uuid_pool_correct_numbers_returned_4_calls_replenish(self):
+    def test_uuid_pool_correct_numbers_returned_5_calls_replenish_once(self):
         linecache.checkcache(filename=self.list_based_region.file_path)
         response = self.generate_allocation(5, self.test_pool, self.list_based_region)
         # with a request of 5, we should have 200 items in the file.
