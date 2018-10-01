@@ -179,7 +179,6 @@ class UUIDPoolTest(TestCase):
     def test_uuid_pool_correct_numbers_returned(self):
         response = self.generate_allocation(5, self.test_pool, self.list_based_region)
         numbers_returned = response.number_list
-        numbers_read = []
         # check first five items requested.
         with open(self.list_based_region.file_path, 'r') as f:
             count = 0
@@ -206,7 +205,6 @@ class UUIDPoolTest(TestCase):
         for lineno in range(6, 14):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
-
 
     def test_uuid_pool_correct_numbers_returned_5_calls_replenish_once(self):
         all_numbers_returned = []
