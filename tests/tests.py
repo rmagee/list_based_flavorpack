@@ -228,6 +228,7 @@ class UUIDPoolTest(TestCase):
         numbers_returned = response.number_list
         all_numbers_returned += response.number_list
         count = 0
+        linecache.checkcache(filename=self.list_based_region.file_path)        
         for lineno in range(6, 16):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
@@ -238,6 +239,7 @@ class UUIDPoolTest(TestCase):
         numbers_returned = response.number_list
         all_numbers_returned += response.number_list
         count = 0
+        linecache.checkcache(filename=self.list_based_region.file_path)        
         for lineno in range(16, 101):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
@@ -258,6 +260,7 @@ class UUIDPoolTest(TestCase):
         # Replenishment should have been triggered and the file should have 400 UUIDs.
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
         self.assertEqual(400, file_size)
+        linecache.checkcache(filename=self.list_based_region.file_path)        
         for lineno in range(116, 266):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
@@ -278,6 +281,7 @@ class UUIDPoolTest(TestCase):
         # with another request of 50, we should still have 400 UUIDs in the file.
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
         self.assertEqual(400, file_size)
+        linecache.checkcache(filename=self.list_based_region.file_path)        
         for lineno in range(266, 316):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
