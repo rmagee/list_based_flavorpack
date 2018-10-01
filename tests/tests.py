@@ -209,15 +209,17 @@ class UUIDPoolTest(TestCase):
 
 
     def test_uuid_pool_correct_numbers_returned_5_calls_replenish_once(self):
+        all_numbers_returned = []
         linecache.checkcache(filename=self.list_based_region.file_path)
         response = self.generate_allocation(5, self.test_pool, self.list_based_region)
         # with a request of 5, we should have 200 items in the file.
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
-        self.assertEqual(200, file_size)        
+        self.assertEqual(200, file_size)
         numbers_returned = response.number_list
+        all_numbers_returned += response.number_list
         # check first five items requested.
         count = 0
-        for lineno in range(1, 5):
+        for lineno in range(1, 6):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
         response = self.generate_allocation(10, self.test_pool, self.list_based_region)
@@ -226,8 +228,9 @@ class UUIDPoolTest(TestCase):
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
         self.assertEqual(200, file_size)        
         numbers_returned = response.number_list
+        all_numbers_returned += response.number_list
         count = 0
-        for lineno in range(6, 15):
+        for lineno in range(6, 16):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
         response = self.generate_allocation(100, self.test_pool, self.list_based_region)
@@ -235,13 +238,15 @@ class UUIDPoolTest(TestCase):
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
         self.assertEqual(200, file_size)        
         numbers_returned = response.number_list
+        all_numbers_returned += response.number_list
         count = 0
-        for lineno in range(16, 100):
+        for lineno in range(16, 101):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
         # replenish now. Next file size should be 400.
         response = self.generate_allocation(150, self.test_pool, self.list_based_region)
         numbers_returned = response.number_list
+        all_numbers_returned += response.number_list
         count = 0
         '''
         print(numbers_returned)
@@ -255,12 +260,13 @@ class UUIDPoolTest(TestCase):
         # Replenishment should have been triggered and the file should have 400 UUIDs.
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
         self.assertEqual(400, file_size)
-        for lineno in range(116, 265):
+        for lineno in range(116, 266):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
             count += 1
 
         response = self.generate_allocation(50, self.test_pool, self.list_based_region)
         numbers_returned = response.number_list
+        all_numbers_returned += response.number_list
         count = 0
         '''
         print(numbers_returned)
@@ -274,6 +280,15 @@ class UUIDPoolTest(TestCase):
         # with another request of 50, we should still have 400 UUIDs in the file.
         file_size = sum((1 for i in open(self.list_based_region.file_path)))
         self.assertEqual(400, file_size)
-        for lineno in range(266, 315):
+        for lineno in range(266, 316):
             self.assertEqual(numbers_returned[count], linecache.getline(self.list_based_region.file_path, lineno).strip())
-            count += 1        
+            count += 1
+
+        # Finally overall check the continuity of numbers returned vs numbers in the file.
+        # make a list of the 315 items in the file.
+        file_numbers_returned = []
+        for lineno in range(1, 316):
+            file_numbers_returned.append(linecache.getline(self.list_based_region.file_path, lineno).strip())
+        self.assertEqual(len(all_numbers_returned), len(file_numbers_returned))
+        for i in range(len(file_numbers_returned)):
+            self.assertEqual(all_numbers_returned[i], file_numbers_returned[i])
