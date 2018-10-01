@@ -1,7 +1,6 @@
 uuid
 requests
 lxml
-linecache
 urllib
 serialbox
 django
