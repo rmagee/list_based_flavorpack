@@ -12,7 +12,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Copyright 2018 SerialLab Corp.  All rights reserved.
+import uuid
 import requests
+from lxml import etree
 from urllib.parse import urlparse
 from django.utils.translation import gettext as _
 from requests.auth import HTTPBasicAuth, HTTPProxyAuth
@@ -161,6 +163,64 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 'The protocol specified in urn %s is not supported by this '
                 'step or module.'
             ), endpoint.urn)
+
+    def on_failure(self):
+        super().on_failure()
+
+    @property
+    def declared_parameters(self):
+        return {
+            'content-type': 'The content-type to add to the header during any '
+                            'http posts, puts, etc. Default is application/'
+                            'xml',
+            'file-extension': 'The file extension to specify when posting and '
+                              'putting data via http. Default is xml'
+        }
+
+
+class UUIDRequestStep(rules.Step):
+    '''
+    Returns UUIDs.
+    Excepts a request data as follows:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <NumberRequest>
+        <Type>UUID</Type>
+        <Size>10</Size>
+    </NumberRequest>
+    '''
+    def execute(self, data, rule_context: RuleContext):
+        # get the task parameters that we rely on
+        try:
+            self.info(_('Looking for the task parameter with the target Region. '
+                        'Output Name.'))
+            param = models.TaskParameter.objects.get(
+                task__name=rule_context.task_name,
+                name='List-based Region'
+            )
+            # now see if we can get the output critieria based on the param
+            # value
+            self.info(_('Found the region param, now looking up the '
+                        'Region instance with name %s.'),
+                      param.value
+                      )
+        except models.TaskParameter.DoesNotExist:
+            raise capture_errors.ExpectedTaskParameterError(
+                _('The task parameter with name List-based Region '
+                  'could not be found.  This task parameter is required by '
+                  'the NumberRequestTransportStep to function correctly.')
+            )
+        try:
+            region = ListBasedRegion.objects.get(machine_name=param.value)
+            # check the url/urn to see if we support the protocol
+            root = etree.fromstring(data)
+            size = int(root.find('.//Size').text)
+            with open(region.file_path, "a") as f:
+                for i in range (size):
+                    f.write("%s\n" % uuid.uuid1())
+        except Exception as e:
+            self.info(_("An error occurred while sending request to third party: %s"), str(e))
+            self.info(_("Inbound data %s", str(data)))
+            raise
 
     def on_failure(self):
         super().on_failure()
