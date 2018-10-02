@@ -82,7 +82,7 @@ class ListBasedRegionSerializer(RegionSerializer):
     def update(self, instance, validated_data):
         '''
         Creates a list-based region and its processing params.
-        '''        
+        '''
         processing_parameters = validated_data.pop("processing_parameters")
         super(ListBasedRegionSerializer, self).update(instance, validated_data)
         posted_ids = set(param.get('id', None) for param in processing_parameters)
