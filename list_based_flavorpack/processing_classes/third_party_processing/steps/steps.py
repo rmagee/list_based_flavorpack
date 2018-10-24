@@ -141,7 +141,12 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 content_type,
                 file_extension
             )
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except:
+                if response.content:
+                    self.info("Error occurred with following response %s", response.content)
+                raise
             return response
 
     def _supports_protocol(self, endpoint: EndPoint):
