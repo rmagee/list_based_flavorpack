@@ -99,7 +99,7 @@ class ProcessingParameters(models.Model):
     '''
     A key-value pair object meant to hold parameters used for processing classes.
     '''
-    list_based_region = models.ForeignKey(ListBasedRegion, null=True, on_delete=models.PROTECT,
+    list_based_region = models.ForeignKey(ListBasedRegion, null=True, on_delete=models.CASCADE,
                                           related_name="processing_parameters",
                                           verbose_name=_("Processing Class Parameter"),
                                           help_text=_("A key-value pair object meant to hold parameters "

@@ -1,3 +1,7 @@
+uuid
+requests
+lxml
+urllib
 serialbox
 django
 djangorestframework

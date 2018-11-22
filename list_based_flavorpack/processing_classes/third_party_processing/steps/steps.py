@@ -25,7 +25,7 @@ from quartet_output.models import EndPoint
 from quartet_capture import models, rules, errors as capture_errors
 from list_based_flavorpack.models import ListBasedRegion
 
-     
+
 class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
     '''
     Uses the transport information within the `region`.
