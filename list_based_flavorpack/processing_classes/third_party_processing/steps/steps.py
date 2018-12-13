@@ -134,6 +134,7 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 func = self.post_data
             else:
                 func = self.put_data
+            self.info("request sent %s", data)
             response = func(
                 data,
                 rule_context,
@@ -141,7 +142,13 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 content_type,
                 file_extension
             )
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except:
+                if response.content:
+                    self.info("Error occurred with following response %s", response.content)
+                raise
+            self.info("Response Received %s", response.content[0:5000])
             return response
 
     def _supports_protocol(self, endpoint: EndPoint):
