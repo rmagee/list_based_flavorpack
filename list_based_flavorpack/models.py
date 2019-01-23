@@ -43,26 +43,26 @@ class ListBasedRegion(sb_models.Region):
     end_point = models.ForeignKey(
         EndPoint,
         null=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=_("End Point"),
         help_text=_("A protocol-specific endpoint defining where"
                     "any data will come from"),)
     rule = models.ForeignKey(
         Rule,
         null=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=("Processing Rule"),
         help_text=_("A rule that may be executed by the region processing class."))
     authentication_info = models.ForeignKey(
         AuthenticationInfo,
         null=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=_("Authentication Info"),
         help_text=_("The Authentication Info to use."))
     template = models.ForeignKey(
         Template,
         null=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=_("Message Template"),
         help_text=_("The Django/Jinja template to send a formatted request for number ranges")
     )
@@ -70,7 +70,8 @@ class ListBasedRegion(sb_models.Region):
         max_length=150,
         null=False,
         help_text=_('The full python path to the class that will be processing region allocations'),
-        verbose_name=_('Processing Class Path')
+        verbose_name=_('Processing Class Path'),
+        default='list_based_flavorpack.processing_classes.third_party_processing.processing.ThirdPartyProcessingClass'
     )
     file_id = models.UUIDField(default=uuid.uuid1, editable=False)
     directory_path = models.CharField(
@@ -85,7 +86,9 @@ class ListBasedRegion(sb_models.Region):
         null=False,
         blank=False,
         help_text=_("The size that the outbound message will request from the third-party system, "
-                    "if numbers available are low. E.g.: 500"))
+                    "if numbers available are low. E.g.: 500"),
+        default=5000
+    )
 
     @property
     def file_path(self):
