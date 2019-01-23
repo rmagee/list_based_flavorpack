@@ -50,6 +50,7 @@ class Command(BaseCommand):
         new_region.active = False
         new_region.pool = new_pool
         new_region.file_id = uuid1()
+        new_region.last_line_number = 1
         new_region.save()
         for param in region.processing_parameters.all():
             new_param = deepcopy(param)
