@@ -22,11 +22,12 @@ from copy import deepcopy
 from uuid import uuid1
 from quartet_capture import models
 
+
 class Command(BaseCommand):
     help = _('Creates the default rfXcel and tracelink processing rules.')
 
     def handle(self, *args, **options):
-        if not models.Rule.objects.exists(name = 'RFXCEL Number Request'):
+        if not models.Rule.objects.exists(name='RFXCEL Number Request'):
             rule = models.Rule()
             rule.name = 'RFXCEL Number Request'
             rule.description = 'Initiates Number Requests to RFXCEL systems.'
@@ -50,12 +51,12 @@ class Command(BaseCommand):
                                 'RFXCELNumberResponseParserStep')
             step2.order = 2
             step2.save()
-        if not models.Rule.objects.exists(name='TraceLink Number Request'):
+        if not models.Rule.objects.exists(name='Tracelink Number Request'):
             rule2 = models.Rule('')
-            rule2.name = 'TraceLink Number Request'
+            rule2.name = 'Tracelink Number Request'
             rule2.description = ('Requests numbers from Tracelink and writes '
-                                'them persistently for use in Number '
-                                'Range distribution.')
+                                 'them persistently for use in Number '
+                                 'Range distribution.')
             rule.save()
             step3 = models.Step()
             step3.rule = rule2
@@ -77,7 +78,3 @@ class Command(BaseCommand):
                                 'TracelinkNumberResponseParserStep')
             step4.order = 2
             step4.save()
-
-
-
-
