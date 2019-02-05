@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='list_based_flavorpack',
-    version='1.0.6',
+    version='1.0.7',
     packages=find_packages(),
     include_package_data=True,
     url='https://gitlab.com/serial-lab/list_based_flavorpack',
