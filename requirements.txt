@@ -10,3 +10,5 @@ quartet_epcis
 quartet_output
 quartet_templates
 quartet_capture
+coreapi
+coreschema

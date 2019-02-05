@@ -18,6 +18,7 @@
 '''
 
 from django.conf.urls import url
+from list_based_flavorpack.api import views
 from list_based_flavorpack.api import viewsets
 from list_based_flavorpack.api.routers import urlpatterns as router_urlpatterns
 
@@ -37,4 +38,11 @@ urlpatterns = [
     url(r'^list-based-region-form/(?P<machine_name>[0-9a-zA-Z]{1,100})/$',
         viewsets.list_based_region_form,
         name='list-based-region-form'),
+        url(r'^clone-list-based-pool/$',
+        views.CloneListBasedFlavorpackView.as_view(),
+        name='clone-pool'),
+    url(
+        r'^clone-list-based-pool/(?P<machine_name>[0-9a-zA-Z\W\s]*)/(?P<new_machine_name>[0-9a-zA-Z\W\s]*)/$',
+        views.CloneListBasedFlavorpackView.as_view(),
+        name='clone-pool-view')
 ] + router_urlpatterns
