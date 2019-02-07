@@ -35,6 +35,9 @@ class ListBasedRegionAdmin(admin.ModelAdmin):
     inlines = [
         ProcessingParametersInline
     ]
+    ordering = [
+        'readable_name'
+    ]
 
 
 def register_to_site(admin_site):
