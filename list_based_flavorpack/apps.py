@@ -25,6 +25,7 @@ class ListBasedFlavorpackConfig(FlavorPackApp):
     # with a meta-class that does some auto-registration for flavorpacks...
     # for more on AppConfigs see the Django documentation.
     name = 'list_based_flavorpack'
+    verbose_name = 'List Based Number Regions'
 
     @property
     def pool_slug_fields(self):

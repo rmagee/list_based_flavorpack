@@ -73,7 +73,7 @@ class ListBasedRegion(sb_models.Region):
         verbose_name=_('Processing Class Path'),
         default='list_based_flavorpack.processing_classes.third_party_processing.processing.ThirdPartyProcessingClass'
     )
-    file_id = models.UUIDField(default=uuid.uuid1, editable=False)
+    file_id = models.UUIDField(default=uuid.uuid1)
     directory_path = models.CharField(
         max_length=150,
         default="/var/quartet/numbers",

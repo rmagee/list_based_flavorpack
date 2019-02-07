@@ -22,13 +22,14 @@ from list_based_flavorpack import models
 
 class ProcessingParametersInline(admin.TabularInline):
     model = models.ProcessingParameters
+    extra = 0
 
 
 class ListBasedRegionAdmin(admin.ModelAdmin):
     list_display = (
-        'pool',
         'readable_name',
         'machine_name',
+        'pool',
         'file_id'
     )
     inlines = [
