@@ -36,7 +36,7 @@ class ThirdPartyProcessingClass:
         for lineno in range(first, max_line):
             item = linecache.getline(region.file_path, lineno).strip()
             if not item:
-                raise ValueError("There is not enough number available for this iteration on line number: %s", lineno)
+                raise ValueError("There are not enough numbers available for this iteration starting on line number: %s", lineno)
             lines.append(item)
         region.last_number_line = max_line
         region.save()
