@@ -1,5 +1,6 @@
 stages:
   - test-python
+  - build-docs
   - pypi
 
 python3_5_unit_test:
