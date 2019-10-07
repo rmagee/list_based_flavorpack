@@ -30,6 +30,21 @@ python3_6_unit_test:
     paths:
       - htmlcov/
 
+pages:
+  image: seriallab/python3.5dev
+  stage: build-docs
+  script:
+  - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR
+  - pip install sphinx recommonmark sphinx_rtd_theme pygments ipython
+  - make html
+  - mv docs/build/html/ public/
+  artifacts:
+      paths:
+      - public
+      expire_in: 1h
+  only:
+    - tags
+
 deploy_pypi:
   image: seriallab/python3.6dev
   stage: pypi

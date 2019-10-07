@@ -20,3 +20,6 @@ quartet_templates
 quartet_capture
 coreapi
 coreschema
+sphinx
+sphinx_rtd_theme
+gs123
