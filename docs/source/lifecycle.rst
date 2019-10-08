@@ -205,6 +205,53 @@ No two response rules are the same but a typical response rule does the followin
     barcodes.
 #.  Takes the numbers and renders them using a Template.
 
+For example:
+
+.. image:: _static/steps.png
+   :scale: 50 %
+
+As you can see above there are two steps.
+
+.. image:: _static/list-conversion.png
+    :scale: 40%
+
+If you look above, you can see that the system is configured to use the
+:code:`gs123.steps.ListBarcodeConversionStep` to convert the numbers being
+returned from barcodes into URN values.  This step needs some information
+in order to convert everything accurately and you can see in the *Step Parameters*
+that a number of things must be provided.  For example, you can see that the
+:code:`Property` parameter is configured for :code:`serial_number`.  This
+is telling the step to use non-padded serial-number values from barcodes. If you
+wanted any serial number values returned from barcodes with their padding intact
+you could specify :code:`padded_serial_number`, for example.
+Conversely, if you wanted to convert
+URN values to barcode values, you would use the :code:`gs123.steps.ListURNConversionStep`.
+The decision you need to make with regards to this depends on what the external
+source system returns and what the requesting system expects. For example,
+you may ask a tracelink system for serialnumbers and get a bunch of barcodes but
+you may have an optel system asking SerialBox for URN values.  At some point,
+the values returned from tracelink must be converted to values that the other
+system can understand (for example).
+
+.. image:: _static/format-step.png
+    :scale: 40%
+
+Now finally, you apply the list of numbers to a given template using (typically)
+the :code:`quartet_templates.steps.TemplateStep`.  As you can see above you
+supply a *Template Name* *Step Parameter* with the name of a QU4RTET template
+to use and the reply will be rendered.  The template engine used is Jinja 2
+and the serial numbers are passed into the template context as the :code:`data`
+variable.
+
+.. image:: _static/template.png
+    :scale: 40%
+
+As you can see above, the template renders the list of serial numbers in the
+rule data stream to the template.  This is ultimately, what gets returned
+to the requesting system.
+
+
+
 The Data is Returned to the Requestor
 -------------------------------------
 
