@@ -453,6 +453,11 @@ class UUIDPoolDBTest(TestCase):
         for i in range(0, 4):
             self.assertEqual(rows[i][0], response.number_list[i])
 
+    def get_rows(self, rowcount):
+        cursor = sqlite3.connect(self.list_based_region.db_file_path).cursor()
+        result = cursor.execute('SELECT * FROM %s LIMIT %s' %
+                                (self.list_based_region.machine_name, rowcount))
+        return result.fetchall()
 
     def test_replenish_twice(self):
         if os.path.exists(self.list_based_region.db_file_path):
@@ -468,8 +473,14 @@ class UUIDPoolDBTest(TestCase):
         self.assertEqual(300, len(response.number_list))
         row_count = get_region_db_number_count(self.list_based_region)
         self.assertEqual(95, row_count)
-        response = self.generate_allocation(100)
+        top20 = self.get_rows(20)
+        response = self.generate_allocation(20, self.test_pool,
+                                            self.list_based_region)
+        for i in range(0, 19):
+            self.assertEqual(top20[i][0], response.number_list[i])
+        response = self.generate_allocation(100, self.test_pool,
+                                            self.list_based_region)
         self.assertEqual(100, len(response.number_list))
         row_count = get_region_db_number_count(self.list_based_region)
         # should be 95 + 200 - 100
-        self.assertEqual(195, row_count)
+        self.assertEqual(175, row_count)
