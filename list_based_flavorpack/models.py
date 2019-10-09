@@ -97,6 +97,15 @@ class ListBasedRegion(sb_models.Region):
         '''
         return os.path.join(self.directory_path, str(self.file_id))
 
+    @property
+    def db_file_path(self):
+        '''
+        If the storage mechanism is a database file, return that.
+        :return:
+        '''
+        return os.path.join(self.directory_path, '%s.%s' %
+        (self.pool.machine_name, 'db'))
+
 
 class ProcessingParameters(models.Model):
     '''

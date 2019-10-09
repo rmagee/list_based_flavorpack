@@ -12,7 +12,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # Copyright 2018 SerialLab Corp.  All rights reserved.
+import os
 import uuid
+import time
+import sqlite3
 import requests
 from lxml import etree
 from urllib.parse import urlparse
@@ -221,13 +224,22 @@ class UUIDRequestStep(rules.Step):
             # check the url/urn to see if we support the protocol
             root = etree.fromstring(data)
             size = int(root.find('.//Size').text)
-            with open(region.file_path, "a") as f:
-                for i in range (size):
-                    f.write("%s\n" % uuid.uuid1())
+            self.persist_data(region, size)
         except Exception as e:
             self.info(_("An error occurred while sending request to third party: %s"), str(e))
-            self.info(_("Inbound data %s", str(data)))
+            self.info(_("Inbound data %s"), str(data))
             raise
+
+    def persist_data(self, region, size):
+        """
+        Saves the data to file.  Override to save it other places.
+        :param region: The region to save the data for.
+        :param size: The number of UUIDs to generate.
+        :return: None
+        """
+        with open(region.file_path, "a") as f:
+            for i in range(size):
+                f.write("%s\n" % uuid.uuid1())
 
     def on_failure(self):
         super().on_failure()
@@ -241,3 +253,24 @@ class UUIDRequestStep(rules.Step):
             'file-extension': 'The file extension to specify when posting and '
                               'putting data via http. Default is xml'
         }
+
+
+class UUIDRequestDBStep(UUIDRequestStep):
+    """
+    Instead of saving data to file will save to a sqlite3 database file.
+    """
+
+    def persist_data(self, region, size):
+        start = time.time()
+        connection = sqlite3.connect(region.db_file_path)
+        cursor = connection.cursor()
+        cursor.execute('begin transaction')
+        self.info('storing the numbers.')
+        for i in range(size):
+            cursor.execute('insert into %s (serial_number, used) '
+                            'values (?, ?)' % region.machine_name,
+                           (str(uuid.uuid1()), 0))
+        cursor.execute('commit')
+        self.info("Execution time: %.3f seconds." % (time.time() - start))
+
+

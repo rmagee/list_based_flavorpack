@@ -18,6 +18,7 @@
 '''
 import os
 import uuid
+import sqlite3
 from serialbox.rules.common import PreprocessingRule
 from serialbox.rules.errors import RuleError
 from quartet_capture.tasks import create_and_queue_task
@@ -27,8 +28,9 @@ from quartet_capture.models import TaskParameter
 class ValidDirectoryError(RuleError):
 
     def __init__(self, detail=None, directory_path=""):
-        self.default_detail = ('An error occurred when attempting to find/create '
-                               'the directory to store numbers: %s' % directory_path)
+        self.default_detail = (
+                    'An error occurred when attempting to find/create '
+                    'the directory to store numbers: %s' % directory_path)
         RuleError.__init__(self, detail=detail)
 
 
@@ -36,6 +38,7 @@ class ValidNumberDirectory(PreprocessingRule):
     '''
     Checks if the number directory exists and attempts to create it if applicable.
     '''
+
     def execute(self, request, pool, region, size):
         # check directory_path
         try:
@@ -62,34 +65,80 @@ class SufficientNumbersStorage(PreprocessingRule):
         '''
         rule_name = region.rule.name
         template = region.template
-        task_param = TaskParameter(name="List-based Region", value=region.machine_name)
-        processing_params_dict = {item.key:item.value for item in region.processing_parameters.all()}
+        task_param = TaskParameter(name="List-based Region",
+                                   value=region.machine_name)
+        processing_params_dict = {item.key: item.value for item in
+                                  region.processing_parameters.all()}
 
-        processing_params_dict["authentication_info"] = region.authentication_info
-        
+        processing_params_dict[
+            "authentication_info"] = region.authentication_info
+
         if region.number_replenishment_size > size:
-            processing_params_dict["allocate"] = {"size": region.number_replenishment_size,
-                                                  "random_event_id": str(uuid.uuid1())}
+            processing_params_dict["allocate"] = {
+                "size": region.number_replenishment_size,
+                "random_event_id": str(uuid.uuid1())}
         else:
-            processing_params_dict["allocate"] = {"size": size, "random_event_id": str(uuid.uuid1())}
+            processing_params_dict["allocate"] = {"size": size,
+                                                  "random_event_id": str(
+                                                      uuid.uuid1())}
 
         # template rendered
         rendered = template.render(processing_params_dict)
-        task = create_and_queue_task(rendered, rule_name, task_type = "Input", run_immediately=True, task_parameters=[task_param])
+        task = create_and_queue_task(rendered, rule_name, task_type="Input",
+                                     run_immediately=True,
+                                     task_parameters=[task_param])
         task.refresh_from_db()  # ensures we get the processed result for the task.a
         region.refresh_from_db()  # ensures we have the most udpated version (in case of parallel calls)
         if task.status != "FINISHED":
-            raise RuleError(detail="An error occurred while attempting to request new numbers from third-party system. Please check the log output from task %s" % task.name)
-    
+            raise RuleError(
+                detail="An error occurred while attempting to request new numbers from third-party system. Please check the log output from task %s" % task.name)
+
     def execute(self, request, pool, region, size):
         try:
             file_size = sum((1 for i in open(region.file_path)))
         except OSError as e:
-            raise RuleError(detail="An error occurred while opening attempting to "
-                            "read the file to store numbers: %s" % region.file_path)
+            raise RuleError(
+                detail="An error occurred while opening attempting to "
+                       "read the file to store numbers: %s" % region.file_path)
         if region.last_number_line + size >= file_size:
-            currently_available = (file_size + 1) - region.last_number_line  # don't overfetch if not needed.
-            self.fetch_more_numbers(request, pool, region, size - currently_available)
+            currently_available = (
+                                              file_size + 1) - region.last_number_line  # don't overfetch if not needed.
+            self.fetch_more_numbers(request, pool, region,
+                                    size - currently_available)
         else:
             # numbers are sufficient. Nothing to do.
             pass
+
+
+def get_db_number_count(region):
+    """
+    Returns the number of rows in a current sqlitedb being used for a given
+    db-region
+    :param region: The region to check.
+    :return: The number of rows in the database.
+    """
+    if not os.path.exists(region.db_file_path):
+        connection = sqlite3.connect(region.db_file_path)
+        connection.execute(
+            "create table if not exists %s "
+            "(serial_number text not null unique, used integer not null)"
+            % region.machine_name
+        )
+    else:
+        connection = sqlite3.connect(region.db_file_path)
+    cursor = connection.cursor()
+    result = cursor.execute('SELECT COUNT(*) FROM %s' %
+                            region.machine_name)
+    rows = result.fetchall()
+    return rows[0][0]
+
+
+class SufficientDBNumbers(SufficientNumbersStorage):
+    """
+    Checks to see if there is enough in the current database to supply the
+    request with numbers.
+    """
+    def execute(self, request, pool, region, size):
+        row_count = get_db_number_count(region)
+        if size > row_count:
+            self.fetch_more_numbers(request, pool, region, size - row_count)
