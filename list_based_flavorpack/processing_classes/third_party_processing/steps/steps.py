@@ -27,6 +27,8 @@ from quartet_output.transport.http import HttpTransportMixin, user_agent
 from quartet_output.models import EndPoint
 from quartet_capture import models, rules, errors as capture_errors
 from list_based_flavorpack.models import ListBasedRegion
+from list_based_flavorpack.processing_classes.third_party_processing.rules import \
+    get_region_table
 
 
 class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
@@ -37,8 +39,9 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
     def execute(self, data, rule_context: RuleContext):
         # get the task parameters that we rely on
         try:
-            self.info(_('Looking for the task parameter with the target Region. '
-                        'Output Name.'))
+            self.info(
+                _('Looking for the task parameter with the target Region. '
+                  'Output Name.'))
             param = models.TaskParameter.objects.get(
                 task__name=rule_context.task_name,
                 name='List-based Region'
@@ -65,7 +68,9 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
             # Pass response for downstream processing.
             rule_context.context['NUMBER_RESPONSE'] = response.content
         except Exception as e:
-            self.error(_("An error occurred while sending request to third party: %s"), str(e))
+            self.error(_(
+                "An error occurred while sending request to third party: %s"),
+                       str(e))
             raise
 
     def get_auth(self, region):
@@ -87,7 +92,7 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 auth = HTTPBasicAuth
             auth = auth(auth_info.username, auth_info.password)
         return auth
-        
+
     def post_data(self, data: str, rule_context: RuleContext,
                   region: ListBasedRegion,
                   content_type='application/xml',
@@ -115,11 +120,11 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
         return response
 
     def _send_message(
-        self,
-        data: str,
-        protocol: str,
-        rule_context: RuleContext,
-        region: ListBasedRegion
+            self,
+            data: str,
+            protocol: str,
+            rule_context: RuleContext,
+            region: ListBasedRegion
     ):
         '''
         Sends a message using the protocol specified.
@@ -149,7 +154,8 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 response.raise_for_status()
             except:
                 if response.content:
-                    self.info("Error occurred with following response %s", response.content)
+                    self.info("Error occurred with following response %s",
+                              response.content)
                 raise
             self.info("Response Received %s", response.content[0:5000])
             return response
@@ -198,11 +204,13 @@ class UUIDRequestStep(rules.Step):
         <Size>10</Size>
     </NumberRequest>
     '''
+
     def execute(self, data, rule_context: RuleContext):
         # get the task parameters that we rely on
         try:
-            self.info(_('Looking for the task parameter with the target Region. '
-                        'Output Name.'))
+            self.info(
+                _('Looking for the task parameter with the target Region. '
+                  'Output Name.'))
             param = models.TaskParameter.objects.get(
                 task__name=rule_context.task_name,
                 name='List-based Region'
@@ -226,7 +234,9 @@ class UUIDRequestStep(rules.Step):
             size = int(root.find('.//Size').text)
             self.persist_data(region, size)
         except Exception as e:
-            self.info(_("An error occurred while sending request to third party: %s"), str(e))
+            self.info(_(
+                "An error occurred while sending request to third party: %s"),
+                      str(e))
             self.info(_("Inbound data %s"), str(data))
             raise
 
@@ -268,9 +278,7 @@ class UUIDRequestDBStep(UUIDRequestStep):
         self.info('storing the numbers.')
         for i in range(size):
             cursor.execute('insert into %s (serial_number, used) '
-                            'values (?, ?)' % region.machine_name,
+                           'values (?, ?)' % get_region_table(region),
                            (str(uuid.uuid1()), 0))
         cursor.execute('commit')
         self.info("Execution time: %.3f seconds." % (time.time() - start))
-
-

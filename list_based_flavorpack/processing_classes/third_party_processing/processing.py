@@ -4,6 +4,8 @@ import sqlite3
 from list_based_flavorpack.processing_classes.third_party_processing import \
     rules
 from list_based_flavorpack.models import ListBasedRegion
+from list_based_flavorpack.processing_classes.third_party_processing.rules import \
+    get_region_table
 
 
 class ThirdPartyProcessingClass:
@@ -71,7 +73,7 @@ class DBProcessingClass(ThirdPartyProcessingClass):
         cursor = connection.cursor()
         cursor.execute('BEGIN TRANSACTION')
         cursor.execute(
-            "SELECT serial_number FROM %s WHERE used = 0 LIMIT ?" % region.machine_name,
+            "SELECT serial_number FROM %s WHERE used = 0 LIMIT ?" % get_region_table(region),
             (size,)
         )
         rows = cursor.fetchall()
@@ -79,7 +81,7 @@ class DBProcessingClass(ThirdPartyProcessingClass):
         for row in rows:
             lines.append(row[0])
             cursor.execute('DELETE FROM %s WHERE serial_number = ?'
-                           % region.machine_name, (row[0],))
+                           % get_region_table(region), (row[0],))
         cursor.execute('COMMIT')
         if len(rows) < size:
             raise ValueError("There are not enough numbers to satisfy the "

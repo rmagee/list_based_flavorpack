@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from list_based_flavorpack.processing_classes import get_region_db_number_count
+from list_based_flavorpack.processing_classes.third_party_processing.rules import get_region_table
 
 from list_based_flavorpack.models import ListBasedRegion
 from quartet_capture.models import Rule, Step
@@ -131,7 +132,7 @@ class UUIDPoolTest(TestCase):
         list_based_region.processing_class_path = "list_based_flavorpack.processing_classes.third_party_processing.processing.ThirdPartyProcessingClass"
         list_based_region.pool = test_pool
         list_based_region.readable_name = "UUID Region"
-        list_based_region.machine_name = "UUIDRegion"
+        list_based_region.machine_name = "REGION_012345678901234"
         list_based_region.active = True
         list_based_region.order = 1
         list_based_region.rule = rule
@@ -366,7 +367,7 @@ class UUIDPoolDBTest(TestCase):
         list_based_region.processing_class_path = "list_based_flavorpack.processing_classes.third_party_processing.processing.DBProcessingClass"
         list_based_region.pool = test_pool
         list_based_region.readable_name = "UUID Region"
-        list_based_region.machine_name = "UUIDRegion"
+        list_based_region.machine_name = "REGION_012345678901234"
         list_based_region.active = True
         list_based_region.order = 1
         list_based_region.rule = rule
@@ -446,7 +447,7 @@ class UUIDPoolDBTest(TestCase):
         connection = sqlite3.connect(self.list_based_region.db_file_path)
         cursor = connection.cursor()
         result = cursor.execute('SELECT * FROM %s LIMIT 5' %
-                                self.list_based_region.machine_name)
+                                get_region_table(self.list_based_region))
         rows = result.fetchall()
         response = self.generate_allocation(5, self.test_pool,
                                             self.list_based_region)
@@ -456,7 +457,7 @@ class UUIDPoolDBTest(TestCase):
     def get_rows(self, rowcount):
         cursor = sqlite3.connect(self.list_based_region.db_file_path).cursor()
         result = cursor.execute('SELECT * FROM %s LIMIT %s' %
-                                (self.list_based_region.machine_name, rowcount))
+                                (get_region_table(self.list_based_region), rowcount))
         return result.fetchall()
 
     def test_replenish_twice(self):

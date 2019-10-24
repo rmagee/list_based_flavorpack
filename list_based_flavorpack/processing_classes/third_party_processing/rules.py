@@ -24,13 +24,15 @@ from serialbox.rules.errors import RuleError
 from quartet_capture.tasks import create_and_queue_task
 from quartet_capture.models import TaskParameter
 
+def get_region_table(region):
+    return "REGION_{0}".format(region.machine_name)
 
 class ValidDirectoryError(RuleError):
 
     def __init__(self, detail=None, directory_path=""):
         self.default_detail = (
-                'An error occurred when attempting to find/create '
-                'the directory to store numbers: %s' % directory_path)
+                    'An error occurred when attempting to find/create '
+                    'the directory to store numbers: %s' % directory_path)
         RuleError.__init__(self, detail=detail)
 
 
@@ -102,7 +104,7 @@ class SufficientNumbersStorage(PreprocessingRule):
                        "read the file to store numbers: %s" % region.file_path)
         if region.last_number_line + size >= file_size:
             currently_available = (
-                                          file_size + 1) - region.last_number_line  # don't overfetch if not needed.
+                                              file_size + 1) - region.last_number_line  # don't overfetch if not needed.
             self.fetch_more_numbers(request, pool, region,
                                     size - currently_available)
         else:
@@ -122,15 +124,19 @@ def get_db_number_count(region):
         connection.execute(
             "create table if not exists %s "
             "(serial_number text not null unique, used integer not null)"
-            % region.machine_name
+            % get_region_table(region)
         )
     else:
         connection = sqlite3.connect(region.db_file_path)
     cursor = connection.cursor()
-    result = cursor.execute(
-        'SELECT COUNT(*) FROM ?'.format(region.machine_name))
+    sql = 'SELECT COUNT(*) FROM %s' % get_region_table(region)
+    print(sql)
+    result = cursor.execute(sql)
     rows = result.fetchall()
     return rows[0][0]
+
+
+
 
 
 class SufficientDBNumbers(SufficientNumbersStorage):
@@ -138,7 +144,6 @@ class SufficientDBNumbers(SufficientNumbersStorage):
     Checks to see if there is enough in the current database to supply the
     request with numbers.
     """
-
     def execute(self, request, pool, region, size):
         row_count = get_db_number_count(region)
         if size > row_count:
