@@ -42,26 +42,25 @@ class ListBasedRegion(sb_models.Region):
         default=1)
     end_point = models.ForeignKey(
         EndPoint,
-        null=True,
         on_delete=models.SET_NULL,
         verbose_name=_("End Point"),
         help_text=_("A protocol-specific endpoint defining where"
                     "any data will come from"),)
     rule = models.ForeignKey(
         Rule,
-        null=True,
+        null=True, empty=True, 
         on_delete=models.SET_NULL,
         verbose_name=("Processing Rule"),
         help_text=_("A rule that may be executed by the region processing class."))
     authentication_info = models.ForeignKey(
         AuthenticationInfo,
-        null=True,
+        null=True, empty=True, 
         on_delete=models.SET_NULL,
         verbose_name=_("Authentication Info"),
         help_text=_("The Authentication Info to use."))
     template = models.ForeignKey(
         Template,
-        null=True,
+        null=True, empty=True, 
         on_delete=models.SET_NULL,
         verbose_name=_("Message Template"),
         help_text=_("The Django/Jinja template to send a formatted request for number ranges")
@@ -77,7 +76,7 @@ class ListBasedRegion(sb_models.Region):
     directory_path = models.CharField(
         max_length=150,
         default="/var/quartet/numbers",
-        null=True,
+        null=True, empty=True, 
         blank=True,
         help_text=_("The full path to the directory where numbers will be stored. "
                     "Leave blank for default. Default is /var/quartet/numbers"))
@@ -111,7 +110,7 @@ class ProcessingParameters(models.Model):
     '''
     A key-value pair object meant to hold parameters used for processing classes.
     '''
-    list_based_region = models.ForeignKey(ListBasedRegion, null=True, on_delete=models.CASCADE,
+    list_based_region = models.ForeignKey(ListBasedRegion, null=True, empty=True,  on_delete=models.CASCADE,
                                           related_name="processing_parameters",
                                           verbose_name=_("Processing Class Parameter"),
                                           help_text=_("A key-value pair object meant to hold parameters "
@@ -120,7 +119,7 @@ class ProcessingParameters(models.Model):
                            null=False,
                            help_text=_("The key part of the key-value pair. Example: q"))
     value = models.CharField(max_length=400,
-                             null=True,
+                             null=True, empty=True, 
                              blank=True,
                              help_text=_("The value part of the key-value pair."))
 
