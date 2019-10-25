@@ -43,6 +43,7 @@ class ListBasedRegion(sb_models.Region):
     end_point = models.ForeignKey(
         EndPoint,
         on_delete=models.SET_NULL,
+        null=True, blank=True,
         verbose_name=_("End Point"),
         help_text=_("A protocol-specific endpoint defining where"
                     "any data will come from"),)
