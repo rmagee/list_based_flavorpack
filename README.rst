@@ -8,7 +8,10 @@ List-Based FlavorPack
         :target: https://gitlab.com/serial-lab/list_based_flavorpack/pipelines
 
 
+Documentation
+-------------
 
+https://serial-lab.gitlab.io/list_based_flavorpack/
 
 Quickstart
 ----------
