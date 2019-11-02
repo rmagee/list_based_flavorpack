@@ -39,7 +39,7 @@ class ListBasedFlavorpackConfig(FlavorPackApp):
     def pool_hyperlink_fields(self):
         return {
             'listbasedregion_set':
-            'list_based_flavorpack.api.serializers.listbasedregion_set'
+            'list_based_flavorpack.api.serializers.listbasedregion_hyperlink_set'
         }
     # Each flavorpack must supply number generators for it's regions
 
