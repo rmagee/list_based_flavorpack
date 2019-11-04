@@ -19,6 +19,8 @@
 import os
 import uuid
 import sqlite3
+from random import randint
+from datetime import date, time, datetime
 from serialbox.rules.common import PreprocessingRule
 from serialbox.rules.errors import RuleError
 from quartet_capture.tasks import create_and_queue_task
@@ -82,7 +84,13 @@ class SufficientNumbersStorage(PreprocessingRule):
         else:
             processing_params_dict["allocate"] = {"size": size,
                                                   "random_event_id": str(
-                                                      uuid.uuid1())}
+                                                      uuid.uuid1())
+                                                  }
+
+        processing_params_dict['date'] = datetime.utcnow().date().isoformat()
+        processing_params_dict['time'] = datetime.utcnow().time().isoformat()
+        processing_params_dict['random_number'] = randint()
+        processing_params_dict['date_time'] = datetime.utcnow().isoformat()
 
         # template rendered
         rendered = template.render(processing_params_dict)
