@@ -89,7 +89,7 @@ class SufficientNumbersStorage(PreprocessingRule):
 
         processing_params_dict['date'] = datetime.utcnow().date().isoformat()
         processing_params_dict['time'] = datetime.utcnow().time().isoformat()
-        processing_params_dict['random_number'] = randint()
+        processing_params_dict['random_number'] = randint(1, 999999999999)
         processing_params_dict['date_time'] = datetime.utcnow().isoformat()
 
         # template rendered
