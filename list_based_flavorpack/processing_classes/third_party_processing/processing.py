@@ -81,6 +81,7 @@ class DBProcessingClass(ThirdPartyProcessingClass):
             lines.append(row[0])
             cursor.execute('DELETE FROM %s WHERE serial_number = ?'
                            % get_region_table(region), (row[0],))
+        connection.commit()
         if len(rows) < size:
             raise ValueError("There are not enough numbers to satisfy the "
                              "request.")
