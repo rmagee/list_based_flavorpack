@@ -71,7 +71,6 @@ class DBProcessingClass(ThirdPartyProcessingClass):
     def get_items(self, region: ListBasedRegion, size):
         connection = sqlite3.connect(region.db_file_path)
         cursor = connection.cursor()
-        cursor.execute('BEGIN TRANSACTION')
         cursor.execute(
             "SELECT serial_number FROM %s WHERE used = 0 LIMIT ?" % get_region_table(region),
             (size,)
@@ -82,7 +81,6 @@ class DBProcessingClass(ThirdPartyProcessingClass):
             lines.append(row[0])
             cursor.execute('DELETE FROM %s WHERE serial_number = ?'
                            % get_region_table(region), (row[0],))
-        cursor.execute('COMMIT')
         if len(rows) < size:
             raise ValueError("There are not enough numbers to satisfy the "
                              "request.")
