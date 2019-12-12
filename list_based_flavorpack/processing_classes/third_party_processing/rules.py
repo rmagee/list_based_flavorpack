@@ -27,7 +27,7 @@ from quartet_capture.tasks import create_and_queue_task
 from quartet_capture.models import TaskParameter
 
 def get_region_table(region):
-    return "REGION_{0}".format(region.machine_name)
+    return "REGION_{0}".format(region.database_name)
 
 class ValidDirectoryError(RuleError):
 

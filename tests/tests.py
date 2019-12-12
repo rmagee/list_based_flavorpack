@@ -444,6 +444,17 @@ class UUIDPoolDBTest(TestCase):
                     break
 
     def test_uuid_pool_correct_numbers_returned_2_calls(self):
+        response = self.generate_allocation(5, self.test_pool,
+                                            self.list_based_region)
+        numbers_returned = response.number_list
+        # check first five items requested.
+        with open(self.list_based_region.file_path, 'r') as f:
+            count = 0
+            for line in f.readlines():
+                self.assertEqual(numbers_returned[count], line.strip())
+                count += 1
+                if count == 5:
+                    break
         connection = sqlite3.connect(self.list_based_region.db_file_path)
         cursor = connection.cursor()
         result = cursor.execute('SELECT * FROM %s LIMIT 5' %

@@ -13,3 +13,4 @@ quartet_capture
 coreapi
 coreschema
 gs123
+haikunator

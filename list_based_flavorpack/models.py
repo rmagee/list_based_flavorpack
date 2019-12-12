@@ -21,11 +21,32 @@ import os
 import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from threading import Lock
+from haikunator import Haikunator
 
 from serialbox import models as sb_models
 from quartet_output.models import EndPoint, AuthenticationInfo
 from quartet_capture.models import Rule
+from quartet_capture.haiku import nouns, adjectives
 from quartet_templates.models import Template
+
+haiku = Haikunator(adjectives=adjectives, nouns=nouns)
+
+def haikunate():
+    '''
+    Since the haikunator is a class method
+    it could not be used directly as a default callable for
+    a django field...hence this function.
+    '''
+    lock = None
+    try:
+        lock = Lock()
+        lock.acquire()
+        ret = haiku.haikunate(token_length=8, token_hex=True, delimiter='_')
+    finally:
+        if lock:
+            lock.release()
+    return ret
 
 
 class ListBasedRegion(sb_models.Region):
@@ -46,46 +67,64 @@ class ListBasedRegion(sb_models.Region):
         null=True, blank=True,
         verbose_name=_("End Point"),
         help_text=_("A protocol-specific endpoint defining where"
-                    "any data will come from"),)
+                    "any data will come from"), )
     rule = models.ForeignKey(
         Rule,
-        null=True, blank=True, 
+        null=True, blank=True,
         on_delete=models.SET_NULL,
         verbose_name=("Processing Rule"),
-        help_text=_("A rule that may be executed by the region processing class."))
+        help_text=_(
+            "A rule that may be executed by the region processing class."))
     authentication_info = models.ForeignKey(
         AuthenticationInfo,
-        null=True, blank=True, 
+        null=True, blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("Authentication Info"),
         help_text=_("The Authentication Info to use."))
     template = models.ForeignKey(
         Template,
-        null=True, blank=True, 
+        null=True, blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("Message Template"),
-        help_text=_("The Django/Jinja template to send a formatted request for number ranges")
+        help_text=_(
+            "The Django/Jinja template to send a formatted request for number ranges")
     )
     processing_class_path = models.CharField(
         max_length=150,
         null=False,
-        help_text=_('The full python path to the class that will be processing region allocations'),
+        help_text=_(
+            'The full python path to the class that will be processing region allocations'),
         verbose_name=_('Processing Class Path'),
         default='list_based_flavorpack.processing_classes.third_party_processing.processing.ThirdPartyProcessingClass'
     )
-    file_id = models.UUIDField(default=uuid.uuid1)
+    file_id = models.UUIDField(
+        default=uuid.uuid1,
+        help_text=_('If this range utilizes list-based files, then this will'
+                    'be the name of the file located in the directory path.'
+                    ),
+        verbose_name=_('File Name')
+    )
+    database_name = models.CharField(
+        max_length=50, null=True, blank=True,
+        default=haikunate,
+        help_text=_('The name of the database file if this is a database '
+                    'range.'),
+        verbose_name=('Database File')
+    )
     directory_path = models.CharField(
         max_length=150,
         default="/var/quartet/numbers",
         null=True, blank=True,
-        help_text=_("The full path to the directory where numbers will be stored. "
-                    "Leave blank for default. Default is /var/quartet/numbers"))
+        help_text=_(
+            "The full path to the directory where numbers will be stored. "
+            "Leave blank for default. Default is /var/quartet/numbers"))
     number_replenishment_size = models.IntegerField(
         verbose_name=_("Number Replenishment Size"),
         null=False,
         blank=False,
-        help_text=_("The size that the outbound message will request from the third-party system, "
-                    "if numbers available are low. E.g.: 500"),
+        help_text=_(
+            "The size that the outbound message will request from the third-party system, "
+            "if numbers available are low. E.g.: 500"),
         default=5000
     )
 
@@ -103,24 +142,29 @@ class ListBasedRegion(sb_models.Region):
         :return:
         '''
         return os.path.join(self.directory_path, '%s.%s' %
-        (self.pool.machine_name, 'db'))
+                            (self.database_name, 'db'))
 
 
 class ProcessingParameters(models.Model):
     '''
     A key-value pair object meant to hold parameters used for processing classes.
     '''
-    list_based_region = models.ForeignKey(ListBasedRegion, null=True, blank=True,  on_delete=models.CASCADE,
+    list_based_region = models.ForeignKey(ListBasedRegion, null=True,
+                                          blank=True, on_delete=models.CASCADE,
                                           related_name="processing_parameters",
-                                          verbose_name=_("Processing Class Parameter"),
-                                          help_text=_("A key-value pair object meant to hold parameters "
-                                                      "used for processing classes."))
+                                          verbose_name=_(
+                                              "Processing Class Parameter"),
+                                          help_text=_(
+                                              "A key-value pair object meant to hold parameters "
+                                              "used for processing classes."))
     key = models.CharField(max_length=200,
                            null=False,
-                           help_text=_("The key part of the key-value pair. Example: q"))
+                           help_text=_(
+                               "The key part of the key-value pair. Example: q"))
     value = models.CharField(max_length=400,
                              null=True, blank=True,
-                             help_text=_("The value part of the key-value pair."))
+                             help_text=_(
+                                 "The value part of the key-value pair."))
 
     def __str__(self):
         return "{\"%s\": \"%s\"}" % (self.key, self.value)
