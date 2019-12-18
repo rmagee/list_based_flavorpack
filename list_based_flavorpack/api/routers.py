@@ -21,7 +21,7 @@ router = DefaultRouter()
 router.register(
     r'processing-parameters',
     ProcessingParametersViewSet,
-    base_name="processing-parameters"
+    basename="processing-parameters"
 )
 
 urlpatterns = router.urls
