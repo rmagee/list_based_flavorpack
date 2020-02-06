@@ -6,6 +6,9 @@ List-Based FlavorPack
 
 .. image:: https://gitlab.com/serial-lab/list_based_flavorpack/badges/master/coverage.svg
         :target: https://gitlab.com/serial-lab/list_based_flavorpack/pipelines
+        
+.. image:: https://badge.fury.io/py/list_based_flavorpack.svg
+    :target: https://badge.fury.io/py/list_based_flavorpack
 
 
 Documentation
