@@ -38,6 +38,10 @@ class ListBasedRegionAdmin(admin.ModelAdmin):
     ordering = [
         'readable_name'
     ]
+    search_fields = ['readable_name',
+                     'machine_name',
+                     'pool__readable_name',
+                     'pool__machine_name']
 
 
 def register_to_site(admin_site):
