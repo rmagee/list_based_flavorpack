@@ -32,6 +32,7 @@ from quartet_templates.models import Template
 
 haiku = Haikunator(adjectives=adjectives, nouns=nouns)
 
+
 def haikunate():
     '''
     Since the haikunator is a class method
@@ -43,6 +44,7 @@ def haikunate():
         lock = Lock()
         lock.acquire()
         ret = haiku.haikunate(token_length=8, token_hex=True, delimiter='_')
+        ret.strip('-')
     finally:
         if lock:
             lock.release()
