@@ -43,8 +43,8 @@ def haikunate():
     try:
         lock = Lock()
         lock.acquire()
-        ret = haiku.haikunate(token_length=8, token_hex=True, delimiter='_')
-        ret.strip('-')
+        ret = haiku.haikunate(token_length=8, token_hex=True,
+                              delimiter='_').replace('-', '')
     finally:
         if lock:
             lock.release()
