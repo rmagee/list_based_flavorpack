@@ -65,8 +65,8 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
             self.info('Protocol supported.  Sending message to %s.' %
                       region.end_point.urn)
             response = self._send_message(data, protocol, rule_context, region)
-            if 'ErrorCode' in response:
-                raise self.ResponseError(response)
+            if 'ErrorCode' in response.content.decode('utf-8'):
+                raise self.ResponseError(response.content.decode('utf-8'))
             # Pass response for downstream processing.
             rule_context.context['NUMBER_RESPONSE'] = response.content
         except Exception as e:
