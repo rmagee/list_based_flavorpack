@@ -65,6 +65,8 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
             self.info('Protocol supported.  Sending message to %s.' %
                       region.end_point.urn)
             response = self._send_message(data, protocol, rule_context, region)
+            if 'ErrorCode' in response:
+                raise self.ResponseError(response)
             # Pass response for downstream processing.
             rule_context.context['NUMBER_RESPONSE'] = response.content
         except Exception as e:
@@ -72,6 +74,9 @@ class NumberRequestTransportStep(rules.Step, HttpTransportMixin):
                 "An error occurred while sending request to third party: %s"),
                        str(e))
             raise
+
+    class ResponseError(Exception):
+        pass
 
     def get_auth(self, region):
         """
