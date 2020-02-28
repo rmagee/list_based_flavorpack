@@ -20,6 +20,8 @@ from copy import deepcopy
 from uuid import uuid1
 
 
+
+
 def clone_list_based_pool(pool_machine_name, new_pool_machine_name):
     """
     Clones a list-based pool.
@@ -44,6 +46,7 @@ def clone_list_based_pool(pool_machine_name, new_pool_machine_name):
     new_region.id = None
     new_region.machine_name = new_pool_machine_name
     new_region.readable_name = new_region.readable_name + ' clone '
+    new_region.database_name = lb_models.haikunate()
     new_region.active = False
     new_region.pool = new_pool
     new_region.file_id = uuid1()
