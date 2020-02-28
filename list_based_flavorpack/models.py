@@ -97,7 +97,7 @@ class ListBasedRegion(sb_models.Region):
         help_text=_(
             'The full python path to the class that will be processing region allocations'),
         verbose_name=_('Processing Class Path'),
-        default='list_based_flavorpack.processing_classes.third_party_processing.processing.ThirdPartyProcessingClass'
+        default='list_based_flavorpack.processing_classes.third_party_processing.processing.DBProcessingClass'
     )
     file_id = models.UUIDField(
         default=uuid.uuid1,
