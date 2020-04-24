@@ -31,7 +31,7 @@ class ListBasedFlavorpackConfig(FlavorPackApp):
     def pool_slug_fields(self):
         return {
             'listbasedregion_set':
-            'list_based_flavorpack.api.serializers.listbasedregion_set'
+                'list_based_flavorpack.api.serializers.listbasedregion_set'
         }
 
     # Each flavorpack must supply hyperlink fields for it's serializer fields
@@ -39,10 +39,17 @@ class ListBasedFlavorpackConfig(FlavorPackApp):
     def pool_hyperlink_fields(self):
         return {
             'listbasedregion_set':
-            'list_based_flavorpack.api.serializers.listbasedregion_hyperlink_set'
+                'list_based_flavorpack.api.serializers.listbasedregion_hyperlink_set'
         }
-    # Each flavorpack must supply number generators for it's regions
 
+    @property
+    def pool_model_fields(self):
+        return {
+            'listbasedregion_set':
+                'list_based_flavorpack.api.serializers.listbasedregion_model_set'
+        }
+
+    # Each flavorpack must supply number generators for it's regions
     @property
     def generators(self):
         # here we define the model and generator that
@@ -50,7 +57,7 @@ class ListBasedFlavorpackConfig(FlavorPackApp):
         # the appropriate state in the database
         return {
             'list_based_flavorpack.models.ListBasedRegion':
-            'list_based_flavorpack.generators.list_based.ListBasedGenerator'
+                'list_based_flavorpack.generators.list_based.ListBasedGenerator'
         }
 
     @property
