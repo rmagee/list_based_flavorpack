@@ -51,16 +51,6 @@ class ProcessingParametersSerializer(rf_serializers.ModelSerializer):
         model = models.ProcessingParameters
         fields = ('id', 'key', 'value', 'list_based_region',)
 
-
-class ListBasedRegionSerializer2(rf_serializers.ModelSerializer):
-    class Meta:
-        model = models.ListBasedRegion
-        fields = '__all__'
-
-listbasedregion_model_set = ListBasedRegionSerializer2(
-    read_only=True, many=True
-)
-
 class ListBasedRegionSerializer(RegionSerializer):
     '''
     Specifies the model...
@@ -114,6 +104,17 @@ class ListBasedRegionSerializer(RegionSerializer):
                     list_based_region=instance, **processing_parameter)
         return instance
 
+
+class ListBasedRegionSerializer2(RegionSerializer):
+    processing_parameters = ProcessingParametersSerializer(many=True,
+                                                           read_only=False)
+    class Meta:
+        model = models.ListBasedRegion
+        fields = '__all__'
+
+listbasedregion_model_set = ListBasedRegionSerializer2(
+    read_only=True, many=True
+)
 
 class HyperlinkedListBasedRegionSerializer(ListBasedRegionSerializer):
     '''
