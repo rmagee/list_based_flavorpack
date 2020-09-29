@@ -111,7 +111,8 @@ class ListBasedRegion(sb_models.Region):
         default=haikunate,
         help_text=_('The name of the database file if this is a database '
                     'range.'),
-        verbose_name=('Database File')
+        verbose_name=('Database File'),
+        unique=True
     )
     directory_path = models.CharField(
         max_length=150,
