@@ -30,7 +30,7 @@ class ListBasedRegionAdmin(admin.ModelAdmin):
         'readable_name',
         'machine_name',
         'pool',
-        'file_id'
+        'database_name'
     )
     inlines = [
         ProcessingParametersInline
