@@ -51,7 +51,7 @@ class Command(BaseCommand):
                                 'RFXCELNumberResponseParserStep')
             step2.order = 2
             step2.save()
-        if not models.Rule.objects.exists(name='Tracelink Number Request'):
+        if not models.Rule.objects.filter(name='Tracelink Number Request').exists():
             rule2 = models.Rule('')
             rule2.name = 'Tracelink Number Request'
             rule2.description = ('Requests numbers from Tracelink and writes '
