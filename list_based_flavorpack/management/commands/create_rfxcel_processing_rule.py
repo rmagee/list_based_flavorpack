@@ -27,7 +27,7 @@ class Command(BaseCommand):
     help = _('Creates the default rfXcel and tracelink processing rules.')
 
     def handle(self, *args, **options):
-        if not models.Rule.objects.exists(name='RFXCEL Number Request'):
+        if not models.Rule.objects.filter(name='RFXCEL Number Request').exists():
             rule = models.Rule()
             rule.name = 'RFXCEL Number Request'
             rule.description = 'Initiates Number Requests to RFXCEL systems.'
