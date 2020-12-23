@@ -57,7 +57,7 @@ class Command(BaseCommand):
             rule2.description = ('Requests numbers from Tracelink and writes '
                                  'them persistently for use in Number '
                                  'Range distribution.')
-            rule.save()
+            rule2.save()
             step3 = models.Step()
             step3.rule = rule2
             step3.name = 'Number Request Transport Step'
