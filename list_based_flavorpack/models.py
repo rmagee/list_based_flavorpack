@@ -30,26 +30,13 @@ from quartet_capture.models import Rule
 from quartet_capture.haiku import nouns, adjectives
 from quartet_templates.models import Template
 
-haiku = Haikunator(adjectives=adjectives, nouns=nouns)
-
-
 def haikunate():
     '''
-    Since the haikunator is a class method
-    it could not be used directly as a default callable for
-    a django field...hence this function.
+    Left as an artifact to allow for database migrations to succeed.
+    This function was moved to an instance-level function of the model
+    class due to thread-safety issues.
     '''
-    lock = None
-    try:
-        lock = Lock()
-        lock.acquire()
-        ret = haiku.haikunate(token_length=8, token_hex=True,
-                              delimiter='_').replace('-', '')
-    finally:
-        if lock:
-            lock.release()
-    return ret
-
+    pass
 
 class ListBasedRegion(sb_models.Region):
     '''
@@ -108,7 +95,6 @@ class ListBasedRegion(sb_models.Region):
     )
     database_name = models.CharField(
         max_length=50, null=True, blank=True,
-        default=haikunate,
         help_text=_('The name of the database file if this is a database '
                     'range.'),
         verbose_name=('Database File'),
@@ -130,6 +116,22 @@ class ListBasedRegion(sb_models.Region):
             "if numbers available are low. E.g.: 500"),
         default=5000
     )
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.database_name = self.haikunate()
+        super().save(force_insert, force_update, using, update_fields)
+
+    def haikunate(self):
+        '''
+        Since the haikunator is a class method
+        it could not be used directly as a default callable for
+        a django field...hence this function.
+        '''
+        haiku = Haikunator(adjectives=adjectives, nouns=nouns)
+        return haiku.haikunate(token_length=16, token_hex=True,
+                              delimiter='_').replace('-', '')
+
 
     @property
     def file_path(self):

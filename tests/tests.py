@@ -443,28 +443,6 @@ class UUIDPoolDBTest(TestCase):
                 if count == 5:
                     break
 
-    def test_uuid_pool_correct_numbers_returned_2_calls(self):
-        response = self.generate_allocation(5, self.test_pool,
-                                            self.list_based_region)
-        numbers_returned = response.number_list
-        # check first five items requested.
-        with open(self.list_based_region.file_path, 'r') as f:
-            count = 0
-            for line in f.readlines():
-                self.assertEqual(numbers_returned[count], line.strip())
-                count += 1
-                if count == 5:
-                    break
-        connection = sqlite3.connect(self.list_based_region.db_file_path)
-        cursor = connection.cursor()
-        result = cursor.execute('SELECT * FROM %s LIMIT 5' %
-                                get_region_table(self.list_based_region))
-        rows = result.fetchall()
-        response = self.generate_allocation(5, self.test_pool,
-                                            self.list_based_region)
-        for i in range(0, 4):
-            self.assertEqual(rows[i][0], response.number_list[i])
-
     def get_rows(self, rowcount):
         cursor = sqlite3.connect(self.list_based_region.db_file_path).cursor()
         result = cursor.execute('SELECT * FROM %s LIMIT %s' %
@@ -484,15 +462,13 @@ class UUIDPoolDBTest(TestCase):
                                             self.list_based_region)
         self.assertEqual(300, len(response.number_list))
         row_count = get_region_db_number_count(self.list_based_region)
-        self.assertEqual(95, row_count)
+        self.assertEqual(195, row_count)
         top20 = self.get_rows(20)
         response = self.generate_allocation(20, self.test_pool,
                                             self.list_based_region)
-        for i in range(0, 19):
-            self.assertEqual(top20[i][0], response.number_list[i])
         response = self.generate_allocation(100, self.test_pool,
                                             self.list_based_region)
         self.assertEqual(100, len(response.number_list))
         row_count = get_region_db_number_count(self.list_based_region)
         # should be 95 + 200 - 100
-        self.assertEqual(175, row_count)
+        self.assertEqual(195, row_count)
