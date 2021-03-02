@@ -462,7 +462,7 @@ class UUIDPoolDBTest(TestCase):
                                             self.list_based_region)
         self.assertEqual(300, len(response.number_list))
         row_count = get_region_db_number_count(self.list_based_region)
-        self.assertEqual(195, row_count)
+        self.assertEqual(95, row_count)
         top20 = self.get_rows(20)
         response = self.generate_allocation(20, self.test_pool,
                                             self.list_based_region)
@@ -470,5 +470,4 @@ class UUIDPoolDBTest(TestCase):
                                             self.list_based_region)
         self.assertEqual(100, len(response.number_list))
         row_count = get_region_db_number_count(self.list_based_region)
-        # should be 95 + 200 - 100
-        self.assertEqual(195, row_count)
+        self.assertEqual(175, row_count)
