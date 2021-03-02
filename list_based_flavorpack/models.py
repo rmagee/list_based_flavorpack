@@ -17,18 +17,19 @@
     along with RandomFlavorpack.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import os
 import uuid
+
+import os
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from threading import Lock
 from haikunator import Haikunator
 
-from serialbox import models as sb_models
-from quartet_output.models import EndPoint, AuthenticationInfo
-from quartet_capture.models import Rule
 from quartet_capture.haiku import nouns, adjectives
+from quartet_capture.models import Rule
+from quartet_output.models import EndPoint, AuthenticationInfo
 from quartet_templates.models import Template
+from serialbox import models as sb_models
+
 
 def haikunate():
     '''
@@ -37,6 +38,7 @@ def haikunate():
     class due to thread-safety issues.
     '''
     pass
+
 
 class ListBasedRegion(sb_models.Region):
     '''
@@ -96,7 +98,7 @@ class ListBasedRegion(sb_models.Region):
     database_name = models.CharField(
         max_length=50, null=True, blank=True,
         help_text=_('The name of the database file if this is a database '
-                    'range.'),
+                    'range.  This will be auto-generated if not supplied.'),
         verbose_name=('Database File'),
         unique=True
     )
@@ -119,7 +121,8 @@ class ListBasedRegion(sb_models.Region):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.database_name = self.haikunate()
+        if not self.database_name:
+            self.database_name = self.haikunate()
         super().save(force_insert, force_update, using, update_fields)
 
     def haikunate(self):
@@ -130,8 +133,7 @@ class ListBasedRegion(sb_models.Region):
         '''
         haiku = Haikunator(adjectives=adjectives, nouns=nouns)
         return haiku.haikunate(token_length=16, token_hex=True,
-                              delimiter='_').replace('-', '')
-
+                               delimiter='_').replace('-', '')
 
     @property
     def file_path(self):
@@ -148,6 +150,10 @@ class ListBasedRegion(sb_models.Region):
         '''
         return os.path.join(self.directory_path, '%s.%s' %
                             (self.database_name, 'db'))
+
+    class Meta:
+        verbose_name = _('List-Based Region')
+        verbose_name_plural = _('List-Based Regions')
 
 
 class ProcessingParameters(models.Model):
