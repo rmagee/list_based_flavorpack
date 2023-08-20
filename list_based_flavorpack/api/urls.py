@@ -1,4 +1,4 @@
-'''
+"""
     Copyright 2018 SerialLab, CORP
 
     This file is part of ListBasedFlavorpack.
@@ -15,34 +15,47 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with RandomFlavorpack.  If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
-from django.conf.urls import url
+from django.urls import re_path
 from list_based_flavorpack.api import views
 from list_based_flavorpack.api import viewsets
 from list_based_flavorpack.api.routers import urlpatterns as router_urlpatterns
 
 urlpatterns = [
-    url(r'^list-based-regions/$',
+    re_path(
+        r"^list-based-regions/$",
         viewsets.list_based_region_list,
-        name='list-based-region-list'),
-    url(r'^list-based-region-create/$',
+        name="list-based-region-list",
+    ),
+    re_path(
+        r"^list-based-region-create/$",
         viewsets.list_based_region_create,
-        name='list-based-region-create'),
-    url(r'^list-based-region-detail/(?P<machine_name>[\w\-\_]{1,100})/$',
+        name="list-based-region-create",
+    ),
+    re_path(
+        r"^list-based-region-detail/(?P<machine_name>[\w\-\_]{1,100})/$",
         viewsets.list_based_region_detail,
-        name='list-based-region-detail'),
-    url(r'^list-based-region-modify/(?P<machine_name>[\w\-\_]{1,100})/$',
+        name="list-based-region-detail",
+    ),
+    re_path(
+        r"^list-based-region-modify/(?P<machine_name>[\w\-\_]{1,100})/$",
         viewsets.list_based_region_modify,
-        name='list-based-region-modify'),
-    url(r'^list-based-region-form/(?P<machine_name>[\w\-\_]{1,100})/$',
+        name="list-based-region-modify",
+    ),
+    re_path(
+        r"^list-based-region-form/(?P<machine_name>[\w\-\_]{1,100})/$",
         viewsets.list_based_region_form,
-        name='list-based-region-form'),
-        url(r'^clone-list-based-pool/$',
+        name="list-based-region-form",
+    ),
+    re_path(
+        r"^clone-list-based-pool/$",
         views.CloneListBasedFlavorpackView.as_view(),
-        name='clone-pool'),
-    url(
-        r'^clone-list-based-pool/(?P<machine_name>[\w\-\_]{1,100})/(?P<new_machine_name>[\w\-\_]{1,100})/$',
+        name="clone-pool",
+    ),
+    re_path(
+        r"^clone-list-based-pool/(?P<machine_name>[\w\-\_]{1,100})/(?P<new_machine_name>[\w\-\_]{1,100})/$",
         views.CloneListBasedFlavorpackView.as_view(),
-        name='clone-pool-view')
+        name="clone-pool-view",
+    ),
 ] + router_urlpatterns

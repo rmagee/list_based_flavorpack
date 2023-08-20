@@ -16,15 +16,13 @@
 
 from __future__ import unicode_literals, absolute_import
 
-from django.conf.urls import url, include
+from django.urls import re_path, include
 
-app_name = 'list_based_flavorpack'
+app_name = "list_based_flavorpack"
 
 urlpatterns = [
-    url(r'^capture/', include('quartet_capture.urls',
-                              namespace='quartet-capture')),
-    url(r'^output/', include('quartet_output.urls',
-                             namespace='quartet-output')),
-    url(r'^serialbox/', include('serialbox.api.urls')),    
-    url(r'^templates/', include('quartet_templates.urls')),
+    re_path(r"^capture/", include("quartet_capture.urls", namespace="quartet-capture")),
+    re_path(r"^output/", include("quartet_output.urls", namespace="quartet-output")),
+    re_path(r"^serialbox/", include("serialbox.api.urls")),
+    re_path(r"^templates/", include("quartet_templates.urls")),
 ]
